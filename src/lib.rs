@@ -14,7 +14,7 @@ pub existential type Composed<T1, T2, T3, F1, F2>: Fn(T1) -> T3;
 /// 
 /// // helps seperating the types and the decleration
 /// type Example = Composed<usize, usize, usize, fn(usize) -> usize, fn(usize) -> usize>;
-/// const CONST_CLOSURE: Example = compose(|n| { n * 2}, |n| { n * 3});
+/// const CONST_CLOSURE: Example = compose(|n| n * 2, |n| n * 3);
 /// assert_eq!(CONST_CLOSURE(10), 60);
 /// ```
 pub const fn compose<T1, T2, T3, F1, F2>(func1: F1, func2: F2) -> Composed<T1, T2, T3, F1, F2>
@@ -49,7 +49,7 @@ mod tests {
         assert_eq!(ADD_ONE_THEN_SQUARE(10), 22);
         assert_eq!(SQUARE_THEN_ADD_ONE(10), 21);
 
-        const CONST_CLOSURE: Example = compose(|n| { n * 2}, |n| { n * 3});
+        const CONST_CLOSURE: Example = compose(|n| n * 2, |n| n * 3);
 
         assert_eq!(CONST_CLOSURE(10), 60);
     }
