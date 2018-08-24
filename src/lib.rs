@@ -1,11 +1,22 @@
 #![feature(const_fn)]
 #![feature(existential_type)]
 
-existential type Composed<T1, T2, T3, F1, F2>: Fn(T1) -> T3;
+/// A type decleration for the [`compose`] function.
+/// This *has* to carry around the F1 and F2 generic parameters, which stand for the 2 function being composed.
+pub existential type Composed<T1, T2, T3, F1, F2>: Fn(T1) -> T3;
 
-/// Composed 2 function's into a new function.
+/// Composes 2 function's into a new function.
 /// This is powerfull, because it can be done at compiletime,
 /// and therefore you can assign the composed function to a constant decleration.
+/// # Examples
+/// ```
+/// use rust_fun::{compose, Composed};
+/// 
+/// // helps seperating the types and the decleration
+/// type Example = Composed<usize, usize, usize, fn(usize) -> usize, fn(usize) -> usize>;
+/// const CONST_CLOSURE: Example = compose(|n| { n * 2}, |n| { n * 3});
+/// assert_eq!(CONST_CLOSURE(10), 60);
+/// ```
 pub const fn compose<T1, T2, T3, F1, F2>(func1: F1, func2: F2) -> Composed<T1, T2, T3, F1, F2>
 where
     F1: Fn(T1) -> T2,
