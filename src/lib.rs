@@ -11,25 +11,25 @@ macro_rules! doc_comment {
 macro_rules! meta_compose {
     ($fnname: ident, $functype: tt, $ext_type: tt, $($mutifier:tt)*) => (
         doc_comment!(
-            concat!("A type decleration for the [`", stringify!($fnname), "`] function"),
+            concat!("A type declaration for the [`", stringify!($fnname), "`] function"),
             pub existential type $ext_type<T1, T2, T3, F1, F2>: $functype(T1) -> T3;
         );
         
         doc_comment!(
-            concat!("Composes 2 function's into a new function.
-            This is powerfull, because it can be done at compiletime,
-            and therefore you can assign the composed function to a constant decleration.
-            # Examples
+            concat!("
+                Composes 2 function's into a new function.
+                This is powerfull, because it can be done at compiletime,
+                and therefore you can assign the composed function to a constant variable.
+                # Examples
 
-            ```
-            use rust_fun::{", stringify!($fnname), ", ", stringify!($ext_type), "};
+                ```
+                use rust_fun::{", stringify!($fnname), ", ", stringify!($ext_type), "};
             
-            type Example = ", stringify!($ext_type), "<usize, usize, usize, fn(usize) -> usize, fn(usize) -> usize>;
-            const CONST_CLOSURE: Example = compose(|n| n * 2, |n| n * 3);
-            assert_eq!(CONST_CLOSURE(10), 60);
-            ```
-            "
-            ),
+                type Example = ", stringify!($ext_type), "<usize, usize, usize, fn(usize) -> usize, fn(usize) -> usize>;
+                const CONST_CLOSURE: Example = compose(|n| n * 2, |n| n * 3);
+                assert_eq!(CONST_CLOSURE(10), 60);
+                ```
+            "),
             pub const fn $fnname<T1, T2, T3, F1, F2>($($mutifier)* func1: F1, $($mutifier)* func2: F2) -> $ext_type<T1, T2, T3, F1, F2>
             where
                 F1: $functype(T1) -> T2,
@@ -38,7 +38,6 @@ macro_rules! meta_compose {
                 move |input| func2(func1(input))
             }
         );
-        
     )
 }
 
