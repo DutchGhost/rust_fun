@@ -25,6 +25,9 @@ where
     move |input| func2(func1(input))
 }
 
+use std::sync::{Arc, Mutex};
+pub const ARCED_MUTEX_USIZE: Composed<usize, Mutex<usize>, Arc<Mutex<usize>>, fn(usize) -> Mutex<usize>, fn(Mutex<usize>) -> Arc<Mutex<usize>>> =     compose(Mutex::new, Arc::new);
+
 #[cfg(test)]
 mod tests {
     #[test]
