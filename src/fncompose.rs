@@ -131,11 +131,17 @@ impl <F> FnCompose<F>
 mod tests {
     use super::*;
 
-    existential type Funcy<T, U>: Fn(T) -> U;
+    existential type Ufun: Fn(usize) -> usize;
 
-    const fn happy<T, U>(composed: FnCompose<impl Fn(T) -> U>) -> Funcy<T, U> {
-        composed.into_inner()
+    existential type Funcy<F, T, U>: Fn(T) -> U;
+
+    const fn happy<T, U, F: Fn(T) -> U>(f: F) -> Funcy<F, T, U> {
+        f
     }
 
-    const fooz: Funcy<usize, usize> = happy(FnCompose::new(|x| x).then(|x| x + 1));
+    const fn tester() -> Ufun {
+        FnCompose::new(|x: usize| x).then(|x| x + 1).into_inner()
+    }
+
+    const fooz: Funcy<Ufun, usize, usize> = happy(tester());
 }
