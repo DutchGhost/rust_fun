@@ -63,51 +63,79 @@ use super::*;
 //     }
 // }
 
-pub existential type Funcy<T1, T2, F: Fn(T1) -> T2>: Fn(T1) -> T2;
+// pub existential type Funcy<T1, O, T2, F, F2>: Fn(T1) -> T2;
 
-struct FnCompose<T, O, F>
+// pub struct FnCompose<F>
+// {
+//     func: F,
+// }
+
+// impl <F> FnCompose<F>
+// {
+//     const fn new(func: F) -> FnCompose<F>
+//     {
+//         FnCompose {
+//             func: func,
+//         }
+//     }
+
+//     const fn then<T, O, NewO, F2: Fn(O) -> NewO>(self, func: F2) -> FnCompose<Funcy<T, O, NewO, F, F2>>
+//     where
+//         F: Fn(T) -> O 
+//     {
+//         FnCompose {
+//             func: move |input| func((self.func)(input)),
+//         }
+//     }
+
+// }
+
+// macro_rules! funcs {
+//     ($T: ty, $F: ty, $F2: ty) => {
+//         Funcy<$T, $T, $T, $F, $F2>
+//     }
+// }
+
+struct FnCompose<F>
 {
     func: F,
-    _items: PhantomData<(T, O)>,
 }
 
-impl <T, O, F> FnCompose<T, O, F>
-where
-    F: Fn(T) -> O,
+impl <F> FnCompose<F>
 {
-    const fn new(func: F) -> FnCompose<T, O, F>
+    const fn new(func: F) -> FnCompose<F>
     {
         FnCompose {
             func: func,
-            _items: PhantomData,
         }
     }
 
-    const fn then<NewO, F2: Fn(O) -> NewO>(self, func: F2) -> FnCompose<T, NewO, impl Fn(T) -> NewO>
+    const fn then<T, O, NewO, F2: Fn(O) -> NewO>(self, func: F2) -> FnCompose<impl Fn(T) -> NewO>
     where
+        F: Fn(T) -> O,
     {
         FnCompose {
-            func: move |input| func((self.func)(input)),
-            _items: PhantomData
+            func: move |input| func((self.func)(input))
         }
     }
 
-    const fn into_inner(self) -> Funcy<T, O, F> {
-        self.func
+    const fn into_inner<T, O>(self) -> impl Fn(T) -> O
+    where
+        F: Fn(T) -> O,
+    {
+        move |input| (self.func)(input)
     }
 }
 
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
-    
-//     #[test]
-//     fn test() {
-//         let SuperFn = FnCompose::<usize, usize, usize, fn(usize) -> usize, fn(usize) -> usize>::new(|x| x + 0)
-//         .then(|x| x + 1)
-//         .then(|x| x + 2)
-//         .then(|x| x + 3).into_inner();
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-//         assert_eq!(SuperFn(10), 16);
-//     }
-// }
+    existential type Funcy<T, U>: Fn(T) -> U;
+
+    const fn happy<T, U>(composed: FnCompose<impl Fn(T) -> U>) -> Funcy<T, U> {
+        composed.into_inner()
+    }
+
+    const fooz: Funcy<usize, usize> = happy(FnCompose::new(|x| x).then(|x| x + 1));
+}
