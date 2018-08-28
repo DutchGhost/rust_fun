@@ -45,6 +45,18 @@ meta_compose!(compose, Fn, Composed,);
 meta_compose!(compose_mut, FnMut, ComposedMut, mut);
 meta_compose!(compose_once, FnOnce, ComposedOnce,);
 
+/// This macro Takes a 'Composed' type, and 3 types.
+/// The 3 types are the Input/Output types of the Function's being composed.
+#[macro_export]
+macro_rules! Composed {
+    ($C:tt, $t1:ty, $t2:ty, $t3:ty) => {
+        $C<$t1, $t2, $t3, fn($t1) -> $t2, fn($t2) -> $t3>
+    };
+
+    ($C:tt, $t1:ty) => {
+        $C<$t1, $t1, $t1, fn($t1) -> $t1, fn($t1) -> $t1>
+    }
+}
 
 #[cfg(test)]
 mod tests {
@@ -62,7 +74,7 @@ mod tests {
             n + 1
         }
 
-        type Example = Composed<usize, usize, usize, fn(usize) -> usize, fn(usize) -> usize>;
+        type Example = Composed!(Composed, usize); //Composed<usize, usize, usize, fn(usize) -> usize, fn(usize) -> usize>;
 
         const ADD_ONE_THEN_SQUARE: Example = compose(add_one, square);
         const SQUARE_THEN_ADD_ONE: Example = compose(square, add_one);
