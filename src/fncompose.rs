@@ -15,11 +15,12 @@ impl <T, O, F> FnCompose<T, O, F> {
         }
     }
 
-    const fn then<OO>(self, func: impl Fn(O) -> OO) -> FnCompose<T, OO, impl Fn(T) -> OO>
+    const fn then<NewO, F2>(self, func: F2) -> FnCompose<T, NewO, impl Fn(T) -> NewO>
     where
         F: Fn(T) -> O,
+        F2: Fn(O) -> NewO
     {
-        Self {
+        FnCompose {
             func: compose(self.func, func),
             _items: PhantomData
         }
