@@ -16,7 +16,7 @@ macro_rules! meta_compose {
             concat!("A type declaration for the [`", stringify!($fnname), "`] function"),
             pub existential type $ext_type<T1, T2, T3, F1, F2>: $functype(T1) -> T3;
         );
-        
+
         doc_comment!(
             concat!("
                 Composes 2 function's into a new function.
@@ -26,7 +26,7 @@ macro_rules! meta_compose {
 
                 ```
                 use rust_fun::{", stringify!($fnname), ", ", stringify!($ext_type), "};
-            
+
                 type Example = ", stringify!($ext_type), "<usize, usize, usize, fn(usize) -> usize, fn(usize) -> usize>;
                 const CONST_CLOSURE: Example = compose(|n| n * 2, |n| n * 3);
                 assert_eq!(CONST_CLOSURE(10), 60);
