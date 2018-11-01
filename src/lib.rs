@@ -5,7 +5,6 @@
 const foo: impl Fn() = || {};
 pub mod compose;
 
-
 // macro_rules! doc_comment {
 //     ($x:expr, $($tt:tt)*) => {
 //         #[doc = $x]
@@ -19,7 +18,7 @@ pub mod compose;
 //             concat!("A type declaration for the [`", stringify!($fnname), "`] function"),
 //             pub existential type $ext_type<T1, T2, T3, F1, F2>: $functype(T1) -> T3;
 //         );
-        
+
 //         doc_comment!(
 //             concat!("
 //                 Composes 2 function's into a new function.
@@ -29,7 +28,7 @@ pub mod compose;
 
 //                 ```
 //                 use rust_fun::{", stringify!($fnname), ", ", stringify!($ext_type), "};
-            
+
 //                 type Example = ", stringify!($ext_type), "<usize, usize, usize, fn(usize) -> usize, fn(usize) -> usize>;
 //                 const CONST_CLOSURE: Example = compose(|n| n * 2, |n| n * 3);
 //                 assert_eq!(CONST_CLOSURE(10), 60);
@@ -49,7 +48,6 @@ pub mod compose;
 // meta_compose!(compose, Fn, Composed,);
 // meta_compose!(compose_mut, FnMut, ComposedMut, mut);
 // meta_compose!(compose_once, FnOnce, ComposedOnce,);
-
 
 // #[cfg(test)]
 // mod tests {

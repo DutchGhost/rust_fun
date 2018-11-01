@@ -1,4 +1,3 @@
-
 use std::marker::PhantomData;
 
 pub struct Composer<T, U, F> {
@@ -6,10 +5,8 @@ pub struct Composer<T, U, F> {
     marker: PhantomData<fn(T) -> U>,
 }
 
-impl<T, U, F> Composer<T, U, F>
-where
-    F: Fn(T) -> U,
-{
+impl<T, U, F> Composer<T, U, F> {
+    #[inline(always)]
     pub const fn new(func: F) -> Self {
         Self {
             func,
@@ -17,37 +14,61 @@ where
         }
     }
 
+    #[inline(always)]
     const fn then<Closure, Output>(self, f: Closure) -> Composer<T, Output, impl Fn(T) -> Output>
     where
+        F: Fn(T) -> U,
         Closure: Fn(U) -> Output,
     {
         Composer::new(move |input| f((self.func)(input)))
     }
 
-    const fn then_mut<Closure, Output>(self, f: Closure) -> Composer<T, Output, impl Fn(T) -> Output>
+    #[inline(always)]
+    const fn then_mut<Closure, Output>(
+        mut self,
+        mut f: Closure,
+    ) -> Composer<T, Output, impl FnMut(T) -> Output>
     where
-        Closure: FnMut(U) -> Output
+        F: FnMut(T) -> U,
+        Closure: FnMut(U) -> Output,
     {
-        Composer::new(move |mut input| f((self.func)(input)))
+        Composer::new(move |input| f((self.func)(input)))
     }
 
-    const fn then_once<Closure, Output>(self, f: Closure) -> Composer<T, Output, impl Fn(T) -> Output>
+    #[inline(always)]
+    const fn then_once<Closure, Output>(
+        self,
+        f: Closure,
+    ) -> Composer<T, Output, impl FnOnce(T) -> Output>
     where
-        Closure: FnOnce(U) -> Output
+        F: Fn(T) -> U,
+        Closure: FnOnce(U) -> Output,
     {
         Composer::new(move |input| f((self.func)(input)))
     }
 
     // @NOTE: need to wrap this in a move, returning self.f seems to `run destructors...`
-    const fn build(self) -> impl Fn(T) -> U {
+    #[inline(always)]
+    const fn build(self) -> impl Fn(T) -> U
+    where
+        F: Fn(T) -> U,
+    {
         move |input| (self.func)(input)
     }
 
-    const fn build_mut(self) -> impl FnMut(T) -> U {
+    #[inline(always)]
+    const fn build_mut(mut self) -> impl FnMut(T) -> U
+    where
+        F: FnMut(T) -> U,
+    {
         move |input| (self.func)(input)
     }
 
-    const fn build_once(self) -> impl FnOnce(T) -> U {
+    #[inline(always)]
+    const fn build_once(self) -> impl FnOnce(T) -> U
+    where
+        F: FnOnce(T) -> U,
+    {
         move |input| (self.func)(input)
     }
 }
