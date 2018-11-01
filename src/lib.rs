@@ -1,7 +1,8 @@
 #![feature(const_fn)]
-#![feature(existential_type)]
+// #![feature(existential_type)]
 #![feature(impl_trait_in_bindings)]
 
+const foo: impl Fn() = || {};
 pub mod compose;
 
 
